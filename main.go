@@ -30,39 +30,39 @@ type domaine struct {
 }
 
 type enseignant struct {
-	id_enseignant string
-	nom           string
-	prenom        string
-	grade         string
-	domaine       string
-	niveau        string
-	specialite    string
+	id_enseignant string `faker:"uuid_hyphenated"`
+	nom           string `faker:"name"`
+	prenom        string `faker:"firstname"`
+	grade         string `faker:"name"`
+	domaine       string `faker:"uuid_hyphenated"`
+	niveau        string `faker:"name"`
+	specialite    string `faker:"uuid_hyphenated"`
 }
 
 type etudiant struct {
-	id_etudiant string
-	nom         string
-	prenom      string
-	statut      string
-	specialite  string
-	niveau      string
+	id_etudiant string `faker:"uuid_hyphenated"`
+	nom         string `faker:"name"`
+	prenom      string `faker:"fisrtname"`
+	statut      string `faker:"bloodgrpoup"`
+	specialite  string `faker:"uuid_hyphenated"`
+	niveau      string `faker:"bloodtype"`
 }
 
 type pfe struct {
-	id_pfe    string
-	titre_pfe string
+	id_pfe    string `faker:"uuid_hyphenated"`
+	titre_pfe string `faker:"sentence"`
 }
 
 type cours struct {
-	id_cours    string
-	titre_cours string
-	salle       string
+	id_cours    string `faker:"uuid_hyphenated"`
+	titre_cours string `faker:"sentence"`
+	salle       string `faker:"name"`
 }
 
 type enseigne struct {
-	id_enseigne   string
-	id_enseignant string
-	id_cours      string
+	id_enseigne   string `faker:"uuid_hyphenated"`
+	id_enseignant string `faker:"uuid_hyphenated"`
+	id_cours      string `faker:"uuid_hyphenated"`
 }
 
 func main() {
@@ -100,9 +100,6 @@ func main() {
 
 	defer session.Close()
 
-	
-
-
 	var spec Specialite
 
 	err := faker.FakeData(&spec)
@@ -113,10 +110,10 @@ func main() {
 	fmt.Println(spec.Id_specialite)
 	fmt.Println(spec.Nom_specialite)
 
-	query := session.Query("INSERT INTO specialite(id_specialite, nom_specilaite) VALUES(?,?)",spec.Id_specialite,spec.Nom_specialite)
+	query := session.Query("INSERT INTO specialite(id_specialite, nom_specilaite) VALUES(?,?)", spec.Id_specialite, spec.Nom_specialite)
 	errr = query.Exec()
-	if errr != nil{
+	if errr != nil {
 		log.Fatal(errr)
 	}
-	
+
 }
