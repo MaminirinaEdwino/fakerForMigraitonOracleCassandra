@@ -25,44 +25,44 @@ type Specialite struct {
 }
 
 type domaine struct {
-	id_domaine  gocql.UUID
-	nom_domaine string
+	id_domaine  string `faker:"uuid_hyphenated"`
+	nom_domaine string `faker:"name"`
 }
 
 type enseignant struct {
-	id_enseignant gocql.UUID
+	id_enseignant string
 	nom           string
 	prenom        string
 	grade         string
-	domaine       gocql.UUID
+	domaine       string
 	niveau        string
-	specialite    gocql.UUID
+	specialite    string
 }
 
 type etudiant struct {
-	id_etudiant gocql.UUID
+	id_etudiant string
 	nom         string
 	prenom      string
 	statut      string
-	specialite  gocql.UUID
+	specialite  string
 	niveau      string
 }
 
 type pfe struct {
-	id_pfe    gocql.UUID
+	id_pfe    string
 	titre_pfe string
 }
 
 type cours struct {
-	id_cours    gocql.UUID
+	id_cours    string
 	titre_cours string
 	salle       string
 }
 
 type enseigne struct {
-	id_enseigne   gocql.UUID
-	id_enseignant gocql.UUID
-	id_cours      gocql.UUID
+	id_enseigne   string
+	id_enseignant string
+	id_cours      string
 }
 
 func main() {
