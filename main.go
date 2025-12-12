@@ -24,69 +24,53 @@ type Specialite struct {
 	Nom_specialite string `faker:"name"`
 }
 
-type domaine struct {
-	id_domaine  string `faker:"uuid_hyphenated"`
-	nom_domaine string `faker:"name"`
+type Domaine struct {
+	Id_domaine  string `faker:"uuid_hyphenated"`
+	Nom_domaine string `faker:"name"`
 }
 
-type enseignant struct {
-	id_enseignant string `faker:"uuid_hyphenated"`
-	nom           string `faker:"name"`
-	prenom        string `faker:"firstname"`
-	grade         string `faker:"name"`
-	domaine       string `faker:"uuid_hyphenated"`
-	niveau        string `faker:"name"`
-	specialite    string `faker:"uuid_hyphenated"`
+type Enseignant struct {
+	Id_enseignant string `faker:"uuid_hyphenated"`
+	Nom           string `faker:"name"`
+	Prenom        string `faker:"firstname"`
+	Grade         string `faker:"name"`
+	Domaine       string `faker:"uuid_hyphenated"`
+	Niveau        string `faker:"name"`
+	Specialite    string `faker:"uuid_hyphenated"`
 }
 
-type etudiant struct {
-	id_etudiant string `faker:"uuid_hyphenated"`
-	nom         string `faker:"name"`
-	prenom      string `faker:"fisrtname"`
-	statut      string `faker:"bloodgrpoup"`
-	specialite  string `faker:"uuid_hyphenated"`
-	niveau      string `faker:"bloodtype"`
+type Etudiant struct {
+	Id_etudiant string `faker:"uuid_hyphenated"`
+	Nom         string `faker:"name"`
+	Prenom      string `faker:"fisrtname"`
+	Statut      string `faker:"bloodgrpoup"`
+	Specialite  string `faker:"uuid_hyphenated"`
+	Niveau      string `faker:"bloodtype"`
 }
 
-type pfe struct {
-	id_pfe    string `faker:"uuid_hyphenated"`
-	titre_pfe string `faker:"sentence"`
+type Pfe struct {
+	Id_pfe    string `faker:"uuid_hyphenated"`
+	Titre_pfe string `faker:"sentence"`
 }
 
-type cours struct {
-	id_cours    string `faker:"uuid_hyphenated"`
-	titre_cours string `faker:"sentence"`
-	salle       string `faker:"name"`
+type Cours struct {
+	Id_cours    string `faker:"uuid_hyphenated"`
+	Titre_cours string `faker:"sentence"`
+	Salle       string `faker:"name"`
 }
 
-type enseigne struct {
-	id_enseigne   string `faker:"uuid_hyphenated"`
-	id_enseignant string `faker:"uuid_hyphenated"`
-	id_cours      string `faker:"uuid_hyphenated"`
+type Enseigne struct {
+	Id_enseigne   string `faker:"uuid_hyphenated"`
+	Id_enseignant string `faker:"uuid_hyphenated"`
+	Id_cours      string `faker:"uuid_hyphenated"`
 }
 
+func ErrorLogger(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+} 
 func main() {
-	// 1. Déclarer une variable de type Article
-	// var article Article
-
-	// // 2. Remplir la structure avec des données factices
-	// err := faker.FakeData(&article)
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// // 3. Afficher les données générées
-	// fmt.Println("--- Article Généré ---")
-	// fmt.Printf("ID: %s\n", article.ID)
-	// fmt.Printf("Titre: %s\n", article.Title)
-	// // On affiche juste les 100 premiers caractères du contenu pour la console
-	// fmt.Printf("Contenu (Extrait): %s...\n", article.Content)
-	// fmt.Printf("Auteur: %s\n", article.AuthorEmail)
-	// // fmt.Printf("Date: %s\n", article.CreatedAt.Format("2006-01-02"))
-	// fmt.Printf("Vues: %d\n", article.ViewsCount)
-	// // fmt.Printf("Publié: %t\n", article.IsPublished)
-
 	cluster := gocql.NewCluster("127.0.0.1")
 	cluster.Keyspace = "migration_base"
 	cluster.Consistency = gocql.Quorum
@@ -94,26 +78,48 @@ func main() {
 	cluster.Timeout = 5 * time.Second
 
 	session, errr := cluster.CreateSession()
-	if errr != nil {
-		log.Fatal(errr)
-	}
+	ErrorLogger(errr)
 
 	defer session.Close()
 
 	var spec Specialite
+	var domaine Domaine
+	var enseignant Enseignant
+	var etudiant Etudiant
+	var pfe Pfe
+	var cours Cours
+	var ensigne Enseigne
+
 
 	err := faker.FakeData(&spec)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ErrorLogger(err)
 
 	fmt.Println(spec.Id_specialite)
 	fmt.Println(spec.Nom_specialite)
 
+	err = faker.FakeData(&domaine)
+	ErrorLogger(err)
+
+	err = faker.FakeData(&enseignant)
+	ErrorLogger(err)
+
+	err = faker.FakeData(&etudiant)
+	ErrorLogger(err)
+
+	err = faker.FakeData(&pfe)
+	ErrorLogger(err)
+
+	err = faker.FakeData(&cours)
+	ErrorLogger(err)
+
+	err = faker.FakeData(&ensigne)
+	ErrorLogger(err)
+
 	query := session.Query("INSERT INTO specialite(id_specialite, nom_specilaite) VALUES(?,?)", spec.Id_specialite, spec.Nom_specialite)
+
 	errr = query.Exec()
-	if errr != nil {
-		log.Fatal(errr)
-	}
+	ErrorLogger(errr)
+
+	
 
 }
