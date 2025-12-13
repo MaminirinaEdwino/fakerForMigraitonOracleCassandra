@@ -40,7 +40,8 @@ CREATE TABLE Etudiants (
 
 CREATE TABLE PFE(
     id_pfe uuid PRIMARY KEY,
-    titre_pfe VARCHAR
+    titre_pfe VARCHAR,
+    id_etudiant uuid
 );
 
 CREATE TABLE Cours(

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/go-faker/faker/v4"
@@ -32,25 +32,26 @@ type Domaine struct {
 type Enseignant struct {
 	Id_enseignant string `faker:"uuid_hyphenated"`
 	Nom           string `faker:"name"`
-	Prenom        string `faker:"firstname"`
+	Prenom        string `faker:"name"`
 	Grade         string `faker:"name"`
 	Domaine       string `faker:"uuid_hyphenated"`
-	Niveau        string `faker:"name"`
+	Niveau        string `faker:"sentence"`
 	Specialite    string `faker:"uuid_hyphenated"`
 }
 
 type Etudiant struct {
 	Id_etudiant string `faker:"uuid_hyphenated"`
 	Nom         string `faker:"name"`
-	Prenom      string `faker:"fisrtname"`
-	Statut      string `faker:"bloodgrpoup"`
+	Prenom      string `faker:"name"`
+	Statut      string `faker:"sentence"`
 	Specialite  string `faker:"uuid_hyphenated"`
-	Niveau      string `faker:"bloodtype"`
+	Niveau      string `faker:"sentence"`
 }
 
 type Pfe struct {
-	Id_pfe    string `faker:"uuid_hyphenated"`
-	Titre_pfe string `faker:"sentence"`
+	Id_pfe      string `faker:"uuid_hyphenated"`
+	Titre_pfe   string `faker:"sentence"`
+	Id_etudiant string `faker:"uuid_hyphenated"`
 }
 
 type Cours struct {
@@ -69,7 +70,12 @@ func ErrorLogger(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-} 
+}
+
+func RandomNumber(max int) int {
+	return rand.Intn(max)
+}
+
 func main() {
 	cluster := gocql.NewCluster("127.0.0.1")
 	cluster.Keyspace = "migration_base"
@@ -89,37 +95,66 @@ func main() {
 	var pfe Pfe
 	var cours Cours
 	var ensigne Enseigne
+	var liste_specialite []Specialite
+	var liste_domaine []Domaine
+	var liste_enseignant []Enseignant
+	var liste_etudiant []Etudiant
+	var liste_cours []Cours
+	// var liste_enseigne []Enseigne
+
+	for range 10 {
+		ErrorLogger(faker.FakeData(&spec))
+		liste_specialite = append(liste_specialite, spec)
+		ErrorLogger(session.Query("INSERT INTO specialite (id_specialite, nom_specilaite) VALUES(?,?)", spec.Id_specialite, spec.Nom_specialite).Exec())
+	}
 
 
-	err := faker.FakeData(&spec)
-	ErrorLogger(err)
+	for range 10 {
+		ErrorLogger(faker.FakeData(&domaine))
+		liste_domaine = append(liste_domaine, domaine)
+		ErrorLogger(session.Query("INSERT INTO domaine (id_domaine, nom_domaine) VALUES(?,?)", domaine.Id_domaine, domaine.Nom_domaine).Exec())
+	}
 
-	fmt.Println(spec.Id_specialite)
-	fmt.Println(spec.Nom_specialite)
+	for range 20{
+		ErrorLogger(faker.FakeData(&enseignant))
 
-	err = faker.FakeData(&domaine)
-	ErrorLogger(err)
+		enseignant.Domaine = liste_domaine[RandomNumber(10)].Id_domaine
+		enseignant.Specialite = liste_specialite[RandomNumber(10)].Id_specialite
+		liste_enseignant = append(liste_enseignant, enseignant)
 
-	err = faker.FakeData(&enseignant)
-	ErrorLogger(err)
+		ErrorLogger(session.Query("INSERT INTO enseignants (id_enseignant,  nom, prenom, grade, domaine, niveau, specialite) VALUES(?,?,?,?,?,?,?)", enseignant.Id_enseignant, enseignant.Nom, enseignant.Prenom, enseignant.Grade, enseignant.Domaine, enseignant.Niveau, enseignant.Specialite).Exec())
+	}
 
-	err = faker.FakeData(&etudiant)
-	ErrorLogger(err)
+	for range 20 {
+		ErrorLogger(faker.FakeData(&etudiant))
 
-	err = faker.FakeData(&pfe)
-	ErrorLogger(err)
+		etudiant.Specialite = liste_specialite[RandomNumber(10)].Id_specialite
+		liste_etudiant = append(liste_etudiant, etudiant)
+		ErrorLogger(session.Query("INSERT INTO etudiants (id_etudiants, nom, prenom, statut, specialite, niveau) VALUES(?,?,?,?,?,?)", etudiant.Id_etudiant, etudiant.Nom, etudiant.Prenom, etudiant.Statut, etudiant.Specialite, etudiant.Niveau).Exec())
+	}
 
-	err = faker.FakeData(&cours)
-	ErrorLogger(err)
+	for range 20 {
+		ErrorLogger(faker.FakeData(&pfe))
 
-	err = faker.FakeData(&ensigne)
-	ErrorLogger(err)
+		pfe.Id_etudiant = liste_etudiant[RandomNumber(20)].Id_etudiant
 
-	query := session.Query("INSERT INTO specialite(id_specialite, nom_specilaite) VALUES(?,?)", spec.Id_specialite, spec.Nom_specialite)
+		ErrorLogger(session.Query("INSERT INTO pfe (id_pfe, titre_pfe, id_etudiant) VALUES(?,?,?)", pfe.Id_pfe, pfe.Titre_pfe, pfe.Id_etudiant).Exec())
+	}
 
-	errr = query.Exec()
-	ErrorLogger(errr)
+	for range 20 {
+		ErrorLogger(faker.FakeData(&cours))
 
-	
+		liste_cours = append(liste_cours, cours)
 
+		ErrorLogger(session.Query("INSERT INTO cours (id_cours, titre_cours, salle) VALUES(?,?,?)", cours.Id_cours, cours.Titre_cours, cours.Salle).Exec())
+	}
+
+	for range len(liste_cours) {
+		ErrorLogger(faker.FakeData(&ensigne))
+		ensigne.Id_enseignant = liste_enseignant[RandomNumber(20)].Id_enseignant
+		ensigne.Id_cours = liste_cours[RandomNumber(20)].Id_cours
+		// liste_enseigne = append(liste_enseigne, ensigne)
+
+		ErrorLogger(session.Query("INSERT INTO enseigne (id_enseigne, id_enseignant, id_cours) VALUES(?,?,?)", ensigne.Id_enseigne, ensigne.Id_enseignant, ensigne.Id_cours).Exec())
+	}
 }
