@@ -4,3 +4,5 @@ SELECT table_name from system_schema.tables WHERE keyspace_name='migration_base'
 DESC specilialite;
 DESCRIBE TABLE specilialite ;
 
+
+
