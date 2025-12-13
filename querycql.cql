@@ -15,8 +15,6 @@ CREATE TABLE Domaine (
     nom_domaine VARCHAR
 );
 
-
-
 CREATE TABLE Enseignants (
     id_enseignant uuid PRIMARY KEY,
     nom VARCHAR,

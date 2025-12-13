@@ -78,7 +78,7 @@ func RandomNumber(max int) int {
 
 func main() {
 	cluster := gocql.NewCluster("127.0.0.1")
-	cluster.Keyspace = "migration_base"
+	cluster.Keyspace = keyspace_name
 	cluster.Consistency = gocql.Quorum
 	cluster.Port = 9042
 	cluster.Timeout = 5 * time.Second
